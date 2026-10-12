@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Will you be my girlfriend? 💗</title>
+  <meta name="description" content="A little page with a very important question." />
+  <meta name="theme-color" content="#ffe1e7" />
+
+  <!-- Google Fonts: Dancing Script (headings) + Poppins (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- FontAwesome icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer" />
+
+  <!-- Tailwind CSS (Play CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    window.tailwind && (tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            dancing: ['"Dancing Script"', 'cursive'],
+            poppins: ['Poppins', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    });
+  </script>
+
+  <!-- Reusable components (Tailwind @apply) -->
+  <style type="text/tailwindcss">
+    @layer components {
+      .pill {
+        @apply inline-block rounded-full bg-white/75 px-4 py-1 text-[11px] font-medium uppercase tracking-[0.25em] text-pink-400 shadow-sm;
+      }
+      .btn {
+        @apply inline-flex select-none items-center justify-center gap-2 rounded-full font-medium transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-pink-200/70 active:scale-95;
+      }
+      .btn-primary {
+        @apply bg-gradient-to-r from-pink-400 to-rose-400 px-10 py-4 text-lg text-white shadow-lg shadow-pink-300/50 hover:-translate-y-1 hover:shadow-xl hover:shadow-pink-300/60;
+      }
+      .btn-yes {
+        @apply bg-gradient-to-r from-rose-400 to-pink-500 px-10 py-5 text-2xl text-white shadow-xl shadow-pink-400/50 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-pink-400/60;
+      }
+      .btn-soft {
+        @apply bg-white/80 px-7 py-3.5 text-base text-gray-500 shadow-md shadow-pink-200/40 ring-1 ring-pink-100 hover:-translate-y-0.5 hover:bg-white hover:text-pink-400;
+      }
+      .btn-outline {
+        @apply bg-white/60 px-7 py-3.5 text-base text-pink-400 ring-2 ring-pink-200 hover:-translate-y-0.5 hover:bg-white;
+      }
+      .card {
+        @apply overflow-hidden rounded-3xl border border-white/70 bg-white/80 shadow-lg shadow-pink-200/40 backdrop-blur;
+      }
+      .input-love {
+        @apply w-full rounded-2xl border border-pink-100 bg-white/90 px-4 py-3.5 text-[15px] text-gray-600 placeholder:text-pink-300 focus:border-pink-300 focus:outline-none focus:ring-4 focus:ring-pink-100;
+      }
+      .chip {
+        @apply whitespace-nowrap rounded-full bg-pink-50 px-3 py-1.5 text-xs text-pink-400 ring-1 ring-pink-100 transition hover:bg-pink-100;
+      }
+    }
+  </style>
+
+  <!-- Custom styles: animations, the Cupid heart, floaties -->
+  <style>
+    :root { --hgrad: linear-gradient(145deg, #ff9ec0, #ff4f87); }
+
+    * { -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Poppins', system-ui, sans-serif;
+      color: #7a4b5a;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background:
+        radial-gradient(1000px 520px at 85% -8%, rgba(255,255,255,.85), transparent 60%),
+        linear-gradient(165deg, #ffe9d6 0%, #ffe1e7 32%, #ffd7e5 56%, #ffe5d3 82%, #ffdac9 100%);
+      background-attachment: fixed;
+    }
+    ::selection { background: #ffc9dc; color: #7a2b4a; }
+
+    /* ---------- Screens & transitions ---------- */
+    .screen { display: none; }
+    .screen.active { display: block; animation: fadeIn .45s ease both; }
+    .reveal { animation: fadeSlideUp .7s cubic-bezier(.22,1,.36,1) both; animation-delay: var(--d, 0s); }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(42px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ---------- Floating background hearts ---------- */
+    #floaties { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+    .floaty {
+      position: absolute;
+      bottom: -70px;
+      line-height: 1;
+      animation-name: floatUp;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+      will-change: transform;
+    }
+    @keyframes floatUp {
+      0%   { transform: translateY(0) translateX(0) rotate(-8deg); }
+      50%  { transform: translateY(-55vh) translateX(26px) rotate(10deg); }
+      100% { transform: translateY(-125vh) translateX(-18px) rotate(-6deg); }
+    }
+
+    /* ---------- Confetti / heart explosion canvas ---------- */
+    #fx { position: fixed; top: 0; left: 0; z-index: 50; pointer-events: none; }
+
+    /* ---------- Image placeholders ---------- */
+    .img-box { position: relative; aspect-ratio: 16 / 10; background: linear-gradient(135deg, #ffe9f0, #fff1e6); }
+    .img-box img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .img-ph {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: .5rem; margin: 10px; padding: 1rem;
+      border: 2px dashed #ffc4d7; border-radius: 1rem;
+      color: #f59ab8; text-align: center; font-size: .8rem;
+    }
+
+    /* ---------- The Cupid agent ---------- */
+    .cupid {
+      position: fixed;
+      right: 14px;
+      bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+      z-index: 60;
+      width: 92px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .cupid-btn {
+      position: relative;
+      width: 84px; height: 84px;
+      padding: 0; border: none; background: transparent; cursor: pointer;
+      animation: bob 3.2s ease-in-out infinite;
+      filter: drop-shadow(0 10px 18px rgba(255,79,135,.35));
+    }
+    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-11px); } }
+
+    .heart-body {
+      position: absolute;
+      left: 26px; top: 30px;
+      width: 50px; height: 50px;
+      background-image: var(--hgrad);
+      transform: rotate(-45deg);
+      border-radius: 6px;
+      transition: background-image .5s ease;
+    }
+    .heart-body::before, .heart-body::after {
+      content: "";
+      position: absolute;
+      width: 50px; height: 50px;
+      border-radius: 50%;
+      background-image: var(--hgrad);
+      z-index: 1;
+      transition: background-image .5s ease;
+    }
+    .heart-body::before { top: -25px; left: 0; }
+    .heart-body::after  { top: 0; left: 25px; }
+    .cupid.sad { --hgrad: linear-gradient(145deg, #b8cbe3, #7f9fc7); }
+
+    .face {
+      position: absolute; inset: 0;
+      z-index: 2;
+      transform: rotate(45deg);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 7px;
+    }
+    .eyes { display: flex; gap: 14px; }
+    .eye {
+      position: relative;
+      width: 8px; height: 12px;
+      border-radius: 50%;
+      background: #4a2632;
+      transform-origin: center;
+      animation: blink 4.8s infinite;
+    }
+    .eye::after {
+      content: "";
+      position: absolute; top: 2px; left: 1.5px;
+      width: 3px; height: 3px; border-radius: 50%;
+      background: #fff;
+    }
+    @keyframes blink {
+      0%, 86%, 91%, 100% { transform: scaleY(1); }
+      88.5% { transform: scaleY(.08); }
+    }
+    .mouth {
+      width: 16px; height: 8px;
+      border: 3px solid #4a2632; border-top: none;
+      border-radius: 0 0 16px 16px;
+      transition: all .3s;
+    }
+    .cupid.sad .mouth {
+      border: 3px solid #4a2632; border-bottom: none;
+      border-radius: 16px 16px 0 0;
+      transform: translateY(5px);
+    }
+    .cupid.sad .eye::before {
+      content: "";
+      position: absolute;
+      top: 11px; left: .5px;
+      width: 7px; height: 10px;
+      background: #8ec5f0;
+      border-radius: 50% 50% 60% 60%;
+      animation: tearFall 1.5s ease-in infinite;
+    }
+    @keyframes tearFall {
+      0%   { transform: translateY(0) scale(.7); opacity: 0; }
+      25%  { opacity: 1; }
+      100% { transform: translateY(18px) scale(1); opacity: 0; }
+    }
+    .sad-badge {
+      position: absolute;
+      top: -6px; left: -4px;
+      font-size: 26px;
+      display: none;
+      animation: sadWobble 1.4s ease-in-out infinite;
+    }
+    .cupid.sad .sad-badge { display: block; }
+    @keyframes sadWobble {
+      0%,100% { transform: rotate(-12deg) translateY(0); }
+      50%     { transform: rotate(12deg) translateY(-5px); }
+    }
+
+    /* ---------- Speech bubble ---------- */
+    #cupid-bubble {
+      position: absolute;
+      right: 0; bottom: 104px;
+      width: min(74vw, 262px);
+      padding: 12px 14px;
+      background: rgba(255,255,255,.96);
+      border: 2px solid #ffd0e2;
+      border-radius: 18px;
+      box-shadow: 0 12px 28px rgba(214,120,150,.28);
+      color: #7a4b5a;
+      font-size: .9rem;
+      line-height: 1.45;
+      text-align: left;
+      opacity: 0;
+      transform: translateY(10px) scale(.95);
+      transform-origin: bottom right;
+      pointer-events: none;
+      transition: opacity .3s ease, transform .3s ease;
+    }
+    #cupid-bubble.show { opacity: 1; transform: none; pointer-events: auto; cursor: pointer; }
+    #cupid-bubble::after {
+      content: "";
+      position: absolute;
+      right: 26px; bottom: -9px;
+      width: 16px; height: 16px;
+      background: #fff;
+      border-right: 2px solid #ffd0e2;
+      border-bottom: 2px solid #ffd0e2;
+      border-radius: 0 0 4px 0;
+      transform: rotate(45deg);
+    }
+    .dots { display: inline-flex; gap: 5px; align-items: center; height: 18px; }
+    .dots.hidden { display: none; }
+    .dots span {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #ff8fb8;
+      animation: dotBounce 1.1s infinite ease-in-out;
+    }
+    .dots span:nth-child(2) { animation-delay: .15s; }
+    .dots span:nth-child(3) { animation-delay: .3s; }
+    @keyframes dotBounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: .45; }
+      30%           { transform: translateY(-6px); opacity: 1; }
+    }
+
+    /* ---------- Chat panel ---------- */
+    #chat-panel {
+      position: fixed;
+      right: 12px;
+      bottom: calc(112px + env(safe-area-inset-bottom, 0px));
+      z-index: 55;
+      width: min(92vw, 344px);
+      height: min(64vh, 430px);
+      display: none;
+      flex-direction: column;
+      background: rgba(255,255,255,.97);
+      border: 2px solid #ffd0e2;
+      border-radius: 24px;
+      box-shadow: 0 24px 50px rgba(197,107,145,.32);
+      overflow: hidden;
+    }
+    #chat-panel.open { display: flex; animation: fadeSlideUp .35s cubic-bezier(.22,1,.36,1) both; }
+    .chat-head {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 14px;
+      background: linear-gradient(90deg, #ffe4ec, #fff0e4);
+      border-bottom: 1px solid #ffe0ec;
+    }
+    .chat-head h4 { font-family: 'Dancing Script', cursive; font-size: 1.25rem; color: #f43f7f; line-height: 1; }
+    .chat-head p { font-size: .68rem; color: #d17a97; }
+    #chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      scroll-behavior: smooth;
+    }
+    .msg {
+      max-width: 84%;
+      padding: 8px 12px;
+      border-radius: 16px;
+      font-size: .85rem;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      word-break: break-word;
+      animation: fadeIn .25s ease both;
+    }
+    .msg.cupid { align-self: flex-start; background: #fff0f5; border: 1px solid #ffe0ec; color: #7a4b5a; border-bottom-left-radius: 5px; }
+    .msg.me    { align-self: flex-end; background: linear-gradient(135deg,#ff8fb8,#ff5f95); color: #fff; border-bottom-right-radius: 5px; }
+    .chat-chips { display: flex; gap: 6px; overflow-x: auto; padding: 8px 10px; scrollbar-width: none; }
+    .chat-chips::-webkit-scrollbar { display: none; }
+    .chat-input { display: flex; gap: 8px; padding: 10px; border-top: 1px solid #ffe0ec; background: #fffafc; }
+    .chat-input input {
+      flex: 1;
+      border: 1px solid #ffd7e5;
+      border-radius: 999px;
+      padding: 9px 14px;
+      font-size: .85rem;
+      outline: none;
+      background: #fff;
+      color: #6b4b53;
+    }
+    .chat-input input:focus { border-color: #ff9ec4; box-shadow: 0 0 0 3px #ffe4ee; }
+    .chat-input button {
+      width: 40px; height: 40px;
+      border: none; border-radius: 50%;
+      background: linear-gradient(135deg,#ff8fb8,#ff4f87);
+      color: #fff; cursor: pointer;
+      box-shadow: 0 6px 14px rgba(255,79,135,.4);
+      transition: transform .2s;
+    }
+    .chat-input button:active { transform: scale(.92); }
+
+    /* ---------- Little extras ---------- */
+    .sad-big {
+      font-size: 84px;
+      line-height: 1;
+      display: inline-block;
+      animation: sadPop .7s cubic-bezier(.22,1.6,.36,1) both, sadSway 2.6s ease-in-out 0.7s infinite;
+    }
+    @keyframes sadPop { from { opacity: 0; transform: scale(.2); } to { opacity: 1; transform: scale(1); } }
+    @keyframes sadSway {
+      0%,100% { transform: rotate(-8deg) translateY(0); }
+      50%     { transform: rotate(8deg) translateY(-8px); }
+    }
+    .heart-divider::before, .heart-divider::after {
+      content: ""; flex: 1; height: 1px;
+      background: linear-gradient(90deg, transparent, #ffc4d7);
+    }
+    .heart-divider::after { background: linear-gradient(90deg, #ffc4d7, transparent); }
+
+    /* ---------- typed confirmation input ---------- */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+    .shake { animation: shake .4s ease; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .floaty, .cupid-btn, .sad-big, .eye { animation: none !important; }
+      .reveal, .screen.active { animation-duration: .01s !important; }
+    }
+  </style>
+</head>
+
+<body class="font-poppins">
+
+  <!-- Continuous floating hearts / blossoms -->
+  <div id="floaties" aria-hidden="true"></div>
+
+  <!-- Heart confetti + explosion layer -->
+  <canvas id="fx" aria-hidden="true"></canvas>
+
+  <noscript>
+    <p style="text-align:center; padding: 3rem 1rem; font-family: Poppins, sans-serif;">
+      Please enable JavaScript to open this little surprise 💗
+    </p>
+  </noscript>
+
+  <main class="relative z-10 mx-auto w-full max-w-3xl px-5 pt-12 pb-48 sm:pt-16">
+
+    <!-- ============ SCREEN 1 · INTRO ============ -->
+    <section id="screen-intro" class="screen active text-center">
+      <p class="reveal" style="--d:.05s"><span class="pill">for your eyes only ✨</span></p>
+      <h1 class="reveal mt-6 font-dancing text-5xl leading-tight text-pink-500 sm:text-6xl" style="--d:.18s">
+        Hey, my love…
+      </h1>
+      <p class="reveal mx-auto mt-7 max-w-xl text-lg leading-relaxed text-[#7a4b5a] sm:text-xl" style="--d:.34s">
+        I have a very important question to ask you...
+      </p>
+      <p class="reveal mx-auto mt-3 max-w-md text-sm leading-relaxed text-pink-400" style="--d:.46s">
+        It's a little scary, very exciting, and I've been holding it in for far too long 💗
+      </p>
+      <div class="reveal mt-10" style="--d:.6s">
+        <button class="btn btn-primary" data-goto="screen-story">Continue ❤️</button>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN 2 · STORY ============ -->
+    <section id="screen-story" class="screen">
+      <div class="text-center">
+        <p class="reveal" style="--d:.05s"><span class="pill">our story 💌</span></p>
+        <h2 class="reveal mt-5 font-dancing text-4xl text-pink-500 sm:text-5xl" style="--d:.15s">
+          How it all began
+        </h2>
+        <div class="reveal heart-divider mx-auto mt-5 flex max-w-xs items-center gap-3" style="--d:.25s">
+          <span class="text-sm text-pink-300">❤️</span>
+        </div>
+      </div>
+
+      <div class="mt-9 space-y-6">
+        <!-- ✏️ CHAPTER 1 — edit the text below, paste your photo link in CONFIG.images.firstSight -->
+        <article class="card reveal" style="--d:.32s">
+          <div class="img-box">
+            <img id="img-firstSight" alt="The first time I saw you" style="display:none" />
+            <div class="img-ph" id="ph-firstSight">
+              <i class="fa-regular fa-image text-3xl"></i>
+              <span>Paste your photo link in the code<br /><small>CONFIG.images.firstSight</small></span>
+            </div>
+          </div>
+          <div class="p-5 sm:p-7">
+            <span class="text-[11px] uppercase tracking-[0.25em] text-pink-300">chapter one</span>
+            <h3 class="mt-1 font-dancing text-3xl text-pink-500">How I saw you first time</h3>
+            <!-- ✏️ EDIT THIS TEXT -->
+            <p class="mt-3 text-[15px] leading-relaxed text-gray-500">
+              ✏️ I first saw you at SLIIT. With your long hair and glasses, looking like a simple, sweet girl — that is exactly how I first laid eyes on you. It was love at first sight  .
+            </p>
+          </div>
+        </article>
+
+        <!-- ✏️ CHAPTER 2 — edit the text below, paste your photo link in CONFIG.images.firstTalk -->
+        <article class="card reveal" style="--d:.42s">
+          <div class="img-box">
+            <img id="img-firstTalk" alt="Our first talk" style="display:none" />
+            <div class="img-ph" id="ph-firstTalk">
+              <i class="fa-regular fa-image text-3xl"></i>
+              <span>Paste your photo link in the code<br /><small>CONFIG.images.firstTalk</small></span>
+            </div>
+          </div>
+          <div class="p-5 sm:p-7">
+            <span class="text-[11px] uppercase tracking-[0.25em] text-pink-300">chapter two</span>
+            <h3 class="mt-1 font-dancing text-3xl text-pink-500">Our first talk</h3>
+            <!-- ✏️ EDIT THIS TEXT -->
+            <p class="mt-3 text-[15px] leading-relaxed text-gray-500">
+              ✏️ I first spoke to you while we were on Waliwita road, and that's when we became friends. As far as I remember, after that, on the day of a presentation, we looked at each other's faces and smiled while standing up on stage.
+            </p>
+          </div>
+        </article>
+
+        <!-- ✏️ CHAPTER 3 — edit the text below, paste your photo link in CONFIG.images.feelings -->
+        <article class="card reveal" style="--d:.52s">
+          <div class="img-box">
+            <img id="img-feelings" alt="My feelings for you" style="display:none" />
+            <div class="img-ph" id="ph-feelings">
+              <i class="fa-regular fa-image text-3xl"></i>
+              <span>Paste your photo link in the code<br /><small>CONFIG.images.feelings</small></span>
+            </div>
+          </div>
+          <div class="p-5 sm:p-7">
+            <span class="text-[11px] uppercase tracking-[0.25em] text-pink-300">chapter three</span>
+            <h3 class="mt-1 font-dancing text-3xl text-pink-500">My feelings</h3>
+            <!-- ✏️ EDIT THIS TEXT -->
+            <p class="mt-3 text-[15px] leading-relaxed text-gray-500">
+              ✏️ Even when you were with your previous partner, I already had feelings for you. I was too late to ask if you liked me, and by then, you had already committed to them. So back then, I just stayed quiet and didn't want to disturb or bother you. But now that I know you are single, I really wanted to ask you out in a different, special way like this.
+            </p>
+          </div>
+        </article>
+      </div>
+
+      <div class="reveal mt-10 text-center" style="--d:.62s">
+        <button class="btn btn-primary" data-goto="screen-proposal">I have a question ❤️</button>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN 3 · THE PROPOSAL ============ -->
+    <section id="screen-proposal" class="screen text-center">
+      <p class="reveal" style="--d:.05s"><span class="pill">the big moment</span></p>
+      <h2 class="reveal mx-auto mt-7 max-w-2xl font-dancing text-5xl leading-tight text-pink-500 sm:text-6xl" style="--d:.18s">
+        Will you be my girlfriend?
+      </h2>
+      <p class="reveal mt-6 text-base text-pink-400 sm:text-lg" style="--d:.34s">
+        Take a breath… and answer with your heart 💗
+      </p>
+
+      <!-- Buttons stack vertically on mobile, sit in a row from the sm breakpoint up -->
+      <div class="reveal mt-10 flex flex-col items-stretch justify-center gap-4 sm:flex-row sm:items-center" style="--d:.48s">
+        <button id="btn-yes" class="btn btn-yes">YES ❤️</button>
+        <button id="btn-no" class="btn btn-soft">No</button>
+        <button id="btn-time" class="btn btn-outline">Want some time ⏳</button>
+      </div>
+
+      <p class="reveal mx-auto mt-8 max-w-sm text-xs leading-relaxed text-pink-300" style="--d:.6s">
+        P.S. Cupid is floating right there with tiny hands pressed together 🤞
+      </p>
+    </section>
+
+    <!-- ============ SCREEN 4 · SHE SAID YES ============ -->
+    <section id="screen-yes" class="screen text-center">
+      <p class="reveal" style="--d:.05s"><span class="pill">she said yes 🎉</span></p>
+      <h2 class="reveal mt-7 font-dancing text-5xl leading-tight text-pink-500 sm:text-7xl" style="--d:.16s">
+        I Love You So Much!
+      </h2>
+      <p class="reveal mx-auto mt-6 max-w-xl text-lg leading-relaxed text-[#7a4b5a]" style="--d:.3s">
+        You just made me the happiest person alive. I promise to choose you — today, tomorrow,
+        and every day after that 💖
+      </p>
+
+      <!-- Typed confirmation: she MUST type yes before the final message appears -->
+      <div id="yes-confirm-wrap" class="card reveal mx-auto mt-8 max-w-xl p-6 text-left sm:p-8" style="--d:.44s">
+        <span class="text-[11px] uppercase tracking-[0.25em] text-pink-300">make it official ✍️</span>
+        <h3 class="mt-1 font-dancing text-2xl text-pink-500">Now say it — type “yes” ❤️</h3>
+        <p class="mt-1 text-xs text-pink-300">This part is required. I need to see it in writing 😉</p>
+        <input id="yes-typed" class="input-love mt-4" type="text" autocomplete="off"
+          placeholder="Type YES here…" />
+        <div class="mt-4 flex justify-center">
+          <button id="btn-yes-confirm" class="btn btn-primary w-full sm:w-auto">
+            Confirm <i class="fa-solid fa-heart text-sm"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="yes-done" class="card mx-auto mt-8 hidden max-w-xl p-8 text-center">
+        <div class="text-4xl">💖</div>
+        <h3 class="mt-3 font-dancing text-3xl text-pink-500">She said yes — in writing!</h3>
+        <!-- ✏️ EDIT THIS TEXT -->
+        <p class="mt-3 text-[15px] leading-relaxed text-gray-500">
+          You just made me the happiest person! 🥰❤️ I can't wait to start this new chapter with you. ✨ To all our future late-night talks 🌙, endless laughter 😊, and walking hand-in-hand through life 👩‍❤️‍👨💫. I love you, and I promise to make every day as special as you are to me. 🌹💖♾️
+        </p>
+      </div>
+
+      <p id="yes-email-note" class="reveal mx-auto mt-6 hidden max-w-md rounded-2xl bg-white/80 px-4 py-3 text-sm text-pink-400 shadow-md shadow-pink-200/40" style="--d:.55s">
+        💌 A little email just landed in his inbox: “She said YES!”
+      </p>
+
+      <div class="reveal mt-9 flex flex-col items-center gap-3" style="--d:.66s">
+        <button class="btn btn-primary" data-goto="screen-intro">Replay our story 🔄</button>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN 5 · SHE SAID NO ============ -->
+    <section id="screen-no" class="screen text-center">
+      <div class="reveal" style="--d:.05s"><span class="sad-big">😢</span></div>
+      <h2 class="reveal mt-5 font-dancing text-4xl text-pink-500 sm:text-5xl" style="--d:.16s">
+        It's okay. Really.
+      </h2>
+      <p class="reveal mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-gray-500" style="--d:.28s">
+        Whatever you feel, I respect it — and I'm still really glad you're in my life.
+      </p>
+
+      <div id="no-form-wrap" class="reveal card mx-auto mt-8 max-w-xl p-6 text-left sm:p-8" style="--d:.4s">
+        <h3 class="font-dancing text-2xl text-pink-500">Oh no... Could you tell me why?</h3>
+        <p class="mt-1 text-xs text-pink-300">No judgement, promise. Honest answers help me understand 💗</p>
+        <textarea id="no-reason" class="input-love mt-4 min-h-[130px] resize-y" rows="4"
+          placeholder="You can be completely honest with me... 💗"></textarea>
+        <div class="mt-4 flex justify-center">
+          <button id="btn-no-send" class="btn btn-primary w-full sm:w-auto">
+            Send my answer <i class="fa-solid fa-paper-plane text-sm"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="no-done" class="card mx-auto mt-8 hidden max-w-xl p-8">
+        <div class="text-4xl">💗</div>
+        <h3 class="mt-3 font-dancing text-2xl text-pink-500">Thank you for your honesty</h3>
+        <p class="mt-2 text-[15px] leading-relaxed text-gray-500">
+          It takes courage to be real. I read every word — and I'm not going anywhere.
+        </p>
+        <p id="no-email-note" class="mt-4 hidden rounded-xl bg-pink-50 px-4 py-2.5 text-xs text-pink-400">
+          💌 Your answer is on its way to him.
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN 6 · WANT SOME TIME ============ -->
+    <section id="screen-time" class="screen text-center">
+      <div class="reveal text-6xl" style="--d:.05s">⏳</div>
+      <h2 class="reveal mt-5 font-dancing text-4xl text-pink-500 sm:text-5xl" style="--d:.16s">
+        Take all the time you need.
+      </h2>
+      <p class="reveal mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-gray-500" style="--d:.28s">
+        No rush at all — just tell me when it feels right, and I'll ask again then.
+      </p>
+
+      <div id="time-form-wrap" class="reveal card mx-auto mt-8 max-w-xl p-6 text-left sm:p-8" style="--d:.4s">
+        <h3 class="font-dancing text-2xl text-pink-500">When should I ask again?</h3>
+        <p class="mt-1 text-xs text-pink-300">Pick a day &amp; time that suits you 📅</p>
+        <div class="mt-4">
+          <input id="when-input" type="datetime-local" class="input-love" />
+        </div>
+        <div class="mt-4 flex justify-center">
+          <button id="btn-time-send" class="btn btn-primary w-full sm:w-auto">
+            Set this date <i class="fa-solid fa-calendar-days text-sm"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="time-done" class="card mx-auto mt-8 hidden max-w-xl p-8">
+        <div class="text-4xl">📅</div>
+        <h3 class="mt-3 font-dancing text-2xl text-pink-500">It's a date!</h3>
+        <p id="time-done-when" class="mt-2 text-[15px] leading-relaxed text-gray-500"></p>
+        <p id="time-email-note" class="mt-4 hidden rounded-xl bg-pink-50 px-4 py-2.5 text-xs text-pink-400">
+          💌 He's been told — the countdown starts now ⏳
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============ THE CUPID AGENT ============ -->
+  <div id="cupid" class="cupid">
+    <div id="cupid-bubble" role="status" aria-live="polite" title="Tap to close">
+      <span id="cupid-text"></span>
+      <span id="cupid-dots" class="dots hidden"><span></span><span></span><span></span></span>
+    </div>
+    <button id="cupid-btn" class="cupid-btn" aria-label="Talk to Cupid">
+      <span class="sad-badge">😢</span>
+      <span class="heart-body">
+        <span class="face">
+          <span class="eyes"><span class="eye"></span><span class="eye"></span></span>
+          <span class="mouth"></span>
+        </span>
+      </span>
+    </button>
+  </div>
+
+  <!-- ============ CUPID CHAT PANEL ============ -->
+  <div id="chat-panel" aria-hidden="true" inert>
+    <div class="chat-head">
+      <div class="flex h-9 w-9 items-center justify-center rounded-full bg-white text-lg shadow-sm">💗</div>
+      <div class="flex-1">
+        <h4>Cupid</h4>
+        <p>your little floating guide</p>
+      </div>
+      <button id="chat-close" aria-label="Close chat" class="text-pink-300 transition hover:text-pink-500">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+    <div id="chat-messages"></div>
+    <div class="chat-chips">
+      <button class="chip" type="button">Should I say yes? 😊</button>
+      <button class="chip" type="button">Who are you? 💗</button>
+      <button class="chip" type="button">Tell me a joke 💬</button>
+    </div>
+    <form id="chat-form" class="chat-input">
+      <input id="chat-text" type="text" autocomplete="off" placeholder="Say something to Cupid..." />
+      <button type="submit" aria-label="Send"><i class="fa-solid fa-paper-plane text-sm"></i></button>
+    </form>
+  </div>
+
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+  <script>
+  /* ============================================================
+     ✏️✏️✏️  STEP 1 — YOUR DETAILS  ✏️✏️✏️
+     Replace everything inside the quotes. See README.md for
+     exactly where to find each key.
+     ============================================================ */
+  const CONFIG = {
+    // Your email — her answers land here
+    yourEmail: "rmknrathnayaka2002@gmail.com",
+
+    // EmailJS (https://dashboard.emailjs.com) — your 3 keys, already filled in
+    emailjs: {
+      publicKey: "_uuQ3nRG_UMbPbEgd",
+      serviceId: "service_icxt2at",
+      templateId: "template_zat42tb"
+    },
+
+    // AI brain (optional). The OpenRouter API key NEVER lives in this file —
+    // it sits server-side in api/chat.js + a Vercel environment variable, so
+    // it can't leak from the page or end up in GitHub. If the endpoint is
+    // unavailable (e.g. opened locally), Cupid uses its built-in replies.
+    ai: {
+      chatEndpoint: "/api/chat"
+    },    // ✏️ "Our Journey" photos — the three chapter images (in the img/ folder).
+    // To swap a photo, replace the file in img/ — or paste any direct image
+    // link (Imgur / Google Drive, see README) instead.
+    images: {
+      firstSight: "img/chapter-1.jpg",   // Chapter 1 — the first time I saw you
+      firstTalk: "img/chapter-2.jpg",    // Chapter 2 — our first talk
+      feelings: "img/chapter-3.jpg"      // Chapter 3 — how I feel
+    },
+
+    // Her name — used in the emails & by the AI
+    herName: "REPLACE_WITH_HER_NAME"
+  };
+
+  /* ================= helpers ================= */
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+  const isPlaceholder = (v) => !v || typeof v !== "string" || /REPLACE/i.test(v);
+
+  /* ================= floating background ================= */
+  function buildFloaties() {
+    const glyphs = ["❤️", "💖", "🌸", "💗", "💕", "🌷", "❤️", "🌸"];
+    const host = $("#floaties");
+    const n = window.innerWidth < 640 ? 15 : 24;
+    for (let i = 0; i < n; i++) {
+      const s = document.createElement("span");
+      s.className = "floaty";
+      s.textContent = pick(glyphs);
+      s.style.left = Math.random() * 100 + "%";
+      s.style.fontSize = 14 + Math.random() * 24 + "px";
+      s.style.animationDuration = 13 + Math.random() * 15 + "s";
+      s.style.animationDelay = -Math.random() * 24 + "s";
+      s.style.opacity = 0.35 + Math.random() * 0.45;
+      host.appendChild(s);
+    }
+  }
+
+  /* ================= screen navigation ================= */
+  function goTo(id) {
+    const next = document.getElementById(id);
+    if (!next) return;
+    $$(".screen").forEach((s) => s.classList.remove("active"));
+    next.classList.add("active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.addEventListener("click", (e) => {
+    const t = e.target.closest("[data-goto]");
+    if (t) goTo(t.dataset.goto);
+  });
+
+  /* ================= story images ================= */
+  function loadStoryImages() {
+    Object.keys(CONFIG.images).forEach((key) => {
+      const img = document.getElementById("img-" + key);
+      const ph = document.getElementById("ph-" + key);
+      if (!img || !ph) return;
+      const url = (CONFIG.images[key] || "").trim();
+      const showPh = () => { img.style.display = "none"; ph.style.display = "flex"; };
+      if (isPlaceholder(url)) return showPh();
+      img.onerror = showPh;
+      img.onload = () => { img.style.display = "block"; ph.style.display = "none"; };
+      img.src = url;
+    });
+  }
+
+  /* ================= confetti / heart explosions ================= */
+  const fx = $("#fx");
+  const fctx = fx.getContext("2d");
+  let parts = [];
+  let fxRunning = false;
+  const HEART_COLORS = ["#ff4f87", "#ff7eb3", "#ff9ec0", "#ffb36b", "#ffd1dc", "#f43f7f"];
+
+  function sizeFx() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    fx.width = Math.max(1, Math.floor(window.innerWidth * dpr));
+    fx.height = Math.max(1, Math.floor(window.innerHeight * dpr));
+    fx.style.width = window.innerWidth + "px";
+    fx.style.height = window.innerHeight + "px";
+    fctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  sizeFx();
+  window.addEventListener("resize", sizeFx);
+
+  function drawHeart(x, y, size, rot, color) {
+    fctx.save();
+    fctx.translate(x, y);
+    fctx.rotate(rot);
+    fctx.scale(size, size);
+    fctx.beginPath();
+    fctx.moveTo(0, -0.28);
+    fctx.bezierCurveTo(0.05, -0.5, 0.5, -0.52, 0.5, -0.14);
+    fctx.bezierCurveTo(0.5, 0.16, 0.2, 0.42, 0, 0.64);
+    fctx.bezierCurveTo(-0.2, 0.42, -0.5, 0.16, -0.5, -0.14);
+    fctx.bezierCurveTo(-0.5, -0.52, -0.05, -0.5, 0, -0.28);
+    fctx.closePath();
+    fctx.fillStyle = color;
+    fctx.fill();
+    fctx.restore();
+  }
+
+  function spawn(p) {
+    parts.push(p);
+    if (!fxRunning) {
+      fxRunning = true;
+      requestAnimationFrame(tick);
+    }
+  }
+
+  function tick() {
+    fctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    const keep = [];
+    for (const p of parts) {
+      p.life -= 1;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += p.g;
+      p.vx *= p.fr;
+      p.vy *= p.fr;
+      p.rot += p.vr;
+      if (p.life <= 0 || p.y > window.innerHeight + 120) continue;
+      keep.push(p);
+      fctx.globalAlpha = Math.max(0, Math.min(1, p.life / p.fade));
+      if (p.emoji) {
+        fctx.font = p.size + "px serif";
+        fctx.textAlign = "center";
+        fctx.textBaseline = "middle";
+        fctx.fillText(p.emoji, p.x, p.y);
+      } else {
+        drawHeart(p.x, p.y, p.size, p.rot, p.color);
+      }
+    }
+    parts = keep;
+    fctx.globalAlpha = 1;
+    if (parts.length) {
+      requestAnimationFrame(tick);
+    } else {
+      fxRunning = false;
+      fctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    }
+  }
+
+  function heartExplosion(x, y, n = 90) {
+    for (let i = 0; i < n; i++) {
+      const ang = Math.random() * Math.PI * 2;
+      const sp = 4 + Math.random() * 13;
+      spawn({
+        x: x, y: y,
+        vx: Math.cos(ang) * sp,
+        vy: Math.sin(ang) * sp - 3,
+        g: 0.22, fr: 0.985,
+        size: 9 + Math.random() * 22,
+        rot: Math.random() * 6,
+        vr: (Math.random() - 0.5) * 0.3,
+        color: pick(HEART_COLORS),
+        emoji: null,
+        life: 90 + Math.random() * 70,
+        fade: 45
+      });
+    }
+    for (let i = 0; i < 16; i++) {
+      const ang = Math.random() * Math.PI * 2;
+      const sp = 3 + Math.random() * 10;
+      spawn({
+        x: x, y: y,
+        vx: Math.cos(ang) * sp,
+        vy: Math.sin(ang) * sp - 4,
+        g: 0.2, fr: 0.985,
+        size: 16 + Math.random() * 16,
+        rot: (Math.random() - 0.5) * 0.7,
+        vr: (Math.random() - 0.5) * 0.2,
+        color: null,
+        emoji: pick(["💖", "🌸", "💕", "💗"]),
+        life: 110 + Math.random() * 60,
+        fade: 50
+      });
+    }
+  }
+
+  function heartRain(durationMs = 5000) {
+    const end = Date.now() + durationMs;
+    const iv = setInterval(() => {
+      if (Date.now() > end) return clearInterval(iv);
+      spawn({
+        x: Math.random() * window.innerWidth,
+        y: -40,
+        vx: (Math.random() - 0.5) * 2.4,
+        vy: 2 + Math.random() * 3.4,
+        g: 0.045, fr: 1,
+        size: 13 + Math.random() * 17,
+        rot: Math.random() * 6,
+        vr: (Math.random() - 0.5) * 0.22,
+        color: pick(HEART_COLORS),
+        emoji: Math.random() < 0.22 ? pick(["💖", "🌸", "💕"]) : null,
+        life: 400, fade: 70
+      });
+    }, 55);
+  }
+
+  function sadFall(durationMs = 3800) {
+    const end = Date.now() + durationMs;
+    const iv = setInterval(() => {
+      if (Date.now() > end) return clearInterval(iv);
+      spawn({
+        x: Math.random() * window.innerWidth,
+        y: -40,
+        vx: (Math.random() - 0.5) * 1.6,
+        vy: 1.4 + Math.random() * 2,
+        g: 0.03, fr: 1,
+        size: 16 + Math.random() * 16,
+        rot: (Math.random() - 0.5) * 0.5,
+        vr: 0,
+        color: Math.random() < 0.5 ? "#b8cbe3" : "#cfd8e6",
+        emoji: Math.random() < 0.45 ? pick(["😢", "💔", "🌧️"]) : null,
+        life: 400, fade: 80
+      });
+    }, 90);
+  }
+
+  /* ================= EmailJS ================= */
+  function emailReady() {
+    return typeof emailjs !== "undefined" &&
+      !isPlaceholder(CONFIG.emailjs.publicKey) &&
+      !isPlaceholder(CONFIG.emailjs.serviceId) &&
+      !isPlaceholder(CONFIG.emailjs.templateId) &&
+      !isPlaceholder(CONFIG.yourEmail);
+  }
+
+  function notify({ subject, message, type }) {
+    if (!emailReady()) {
+      console.warn("[Cupid] EmailJS keys are not set yet — email NOT sent. See README.md. Subject:", subject);
+      return Promise.resolve(false);
+    }
+    return emailjs.send(
+      CONFIG.emailjs.serviceId,
+      CONFIG.emailjs.templateId,
+      {
+        to_email: CONFIG.yourEmail,
+        subject: subject,
+        message: message,
+        type: type,
+        her_name: isPlaceholder(CONFIG.herName) ? "" : CONFIG.herName,
+        page: location.href,
+        sent_at: new Date().toLocaleString()
+      },
+      { publicKey: CONFIG.emailjs.publicKey }
+    ).then(() => {
+      console.log("[Cupid] Email sent:", subject);
+      return true;
+    }).catch((err) => {
+      console.error("[Cupid] Email failed:", err);
+      return false;
+    });
+  }
+
+  /* ================= The Cupid agent ================= */
+  const cupidEl = $("#cupid");
+  const bubble = $("#cupid-bubble");
+  const bubbleText = $("#cupid-text");
+  const dots = $("#cupid-dots");
+  let sayId = 0;
+  let bubbleTimer = null;
+
+  function hideBubble() { bubble.classList.remove("show"); }
+
+  bubble.addEventListener("click", hideBubble);
+
+  function setCupidMood(mood) {
+    cupidEl.classList.toggle("sad", mood === "sad");
+  }
+
+  async function cupidSay(text, opts = {}) {
+    const id = ++sayId;
+    clearTimeout(bubbleTimer);
+
+    if (chat.open) {
+      chat.setTyping(true);
+      await wait(Math.min(1100, 450 + text.length * 7));
+      chat.setTyping(false);
+      if (id !== sayId) return;
+      const el = chat.addMsg("cupid", "");
+      await typeInto(el, text, 16, id);
+      chat.scrollEnd();
+      return;
+    }
+
+    bubble.classList.add("show");
+    bubbleText.textContent = "";
+    dots.classList.remove("hidden");
+    await wait(opts.typingMs !== undefined ? opts.typingMs : Math.min(1200, 420 + text.length * 9));
+    if (id !== sayId) return;
+    dots.classList.add("hidden");
+    await typeInto(bubbleText, text, 26, id);
+    if (id !== sayId) return;
+    bubbleTimer = setTimeout(() => { if (id === sayId) hideBubble(); }, 4500 + text.length * 60);
+  }
+
+  async function typeInto(el, text, speed, id) {
+    for (let i = 1; i <= text.length; i++) {
+      if (id !== undefined && id !== sayId) return;
+      el.textContent = text.slice(0, i);
+      await wait(speed);
+    }
+  }
+
+  /* ---- rule-based Cupid (free, safe, no API key) ---- */
+  const RULES = [
+    [/\b(hi|hello|hey|hallo|yo|hiya)\b/i,
+      ["Hi hi! 💗 I'm Cupid — this little heart's personal assistant. Need help finding your way?"]],
+    [/(who are you|what are you|your name|about you)/i,
+      ["I'm Cupid 💗 — a tiny floating heart who guides love stories like yours! Tap my heart anytime."]],
+    [/(should i say|say yes|should.*yes|does he love|really love)/i,
+      ["Hmm… he built you a whole website. That's a pretty big clue 😄💗 But honestly? What does your heart say?"]],
+    [/\b(yes|yeah|yay|accept|of course|i will|i'd love)\b/i,
+      ["YAY! 💖 I can already hear the fireworks! Go tap that YES button 🎉"]],
+    [/\b(no|nope|nah|not really|dont want)\b/i,
+      ["Aww 💔 Take your time… but maybe give him a chance? He tried really hard on this one 💗"]],
+    [/(time|think|wait|later|another day|when)/i,
+      ["Of course! ⏳ The “Want some time” button lets you pick exactly when he should ask again."]],
+    [/(joke|funny|laugh|make me smile)/i,
+      ["Why did the heart go to school? 📚 To get a little *class-y* 💘 …okay, I'll stick to love and leave comedy to him 😄"]],
+    [/(cute|beautiful|pretty|amazing|perfect|best)/i,
+      ["That's YOU! 😍 he says it every day — I just deliver the evidence 💗"]],
+    [/(hungry|food|eat|pizza|ice ?cream|dinner|coffee)/i,
+      ["Ooh, food talk! 🍕 Tell him — a dinner date solves 90% of love problems 😄"]],
+    [/(proposal|girlfriend|website|why.*ask|how.*ask)/i,
+      ["Because you're special 💗 He waited for the perfect moment — and decided you were worth the whole website ✨"]],
+    [/(thank|thanks|cute bot|love you)/i,
+      ["Anytime! 💗 I'll be right here, floating around 😄"]],
+    [/(scared|nervous|unsure|confused|idk)/i,
+      ["Breathe in… breathe out 💗 There's no wrong answer here — just be honest with him. He can take it."]]
+  ];
+  const FALLBACKS = [
+    "Mmm, tell me more 💗",
+    "I'm just a little heart, but I'm listening 👂💕",
+    "He'd probably say anything to make you smile 😄💗",
+    "Interesting… 💭 Go on!",
+    "Whatever you're feeling, this page was made just for you ✨"
+  ];
+
+  function ruleBasedReply(text) {
+    for (const [re, replies] of RULES) {
+      if (re.test(text)) return pick(replies);
+    }
+    return pick(FALLBACKS);
+  }
+
+  /* ---- optional AI (OpenRouter / OpenAI-compatible) ---- */
+  const chat = {
+    open: false,
+    history: [],
+    panel: $("#chat-panel"),
+    msgs: $("#chat-messages"),
+    form: $("#chat-form"),
+    input: $("#chat-text"),
+
+    toggle(force) {
+      const next = force !== undefined ? force : !this.open;
+      this.open = next;
+      this.panel.classList.toggle("open", next);
+      if (next) {
+        this.panel.removeAttribute("inert");
+        this.panel.setAttribute("aria-hidden", "false");
+        hideBubble();
+        if (!this.msgs.children.length) {
+          this.addMsg("cupid", "Hi! I'm Cupid 💗 Ask me anything — or just say hi!");
+        }
+        setTimeout(() => this.input.focus(), 150);
+      } else {
+        // Move focus OUT before hiding from assistive technology — never
+        // leave focus inside an aria-hidden subtree (use inert too).
+        if (this.panel.contains(document.activeElement)) {
+          document.activeElement.blur();
+          const cb = document.getElementById("cupid-btn");
+          if (cb) cb.focus();
+        }
+        this.panel.setAttribute("aria-hidden", "true");
+        this.panel.setAttribute("inert", "");
+      }
+      this.scrollEnd();
+    },
+
+    addMsg(who, text) {
+      const el = document.createElement("div");
+      el.className = "msg " + who;
+      el.textContent = text;
+      this.msgs.appendChild(el);
+      this.scrollEnd();
+      return el;
+    },
+
+    setTyping(on) {
+      let t = $("#chat-typing");
+      if (on && !t) {
+        t = document.createElement("div");
+        t.id = "chat-typing";
+        t.className = "msg cupid";
+        t.innerHTML = '<span class="dots"><span></span><span></span><span></span></span>';
+        this.msgs.appendChild(t);
+        this.scrollEnd();
+      } else if (!on && t) {
+        t.remove();
+      }
+    },
+
+    scrollEnd() { this.msgs.scrollTop = this.msgs.scrollHeight; }
+  };
+
+  async function aiReply(text) {
+    const ai = CONFIG.ai || {};
+    if (!ai.chatEndpoint) return null;
+    if (location.protocol === "file:") return null; // opened locally — no server
+    const res = await fetch(ai.chatEndpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        messages: chat.history.concat([{ role: "user", content: text }]).slice(-8)
+      })
+    });
+    if (!res.ok) throw new Error("chat endpoint HTTP " + res.status);
+    const data = await res.json();
+    const reply = data && data.reply;
+    if (!reply || typeof reply !== "string") throw new Error("empty reply from chat endpoint");
+    return reply;
+  }
+
+  async function getCupidReply(text) {
+    try {
+      const ai = await aiReply(text);
+      if (ai) return ai;
+    } catch (err) {
+      console.warn("[Cupid] AI endpoint unavailable, using built-in replies:", err);
+    }
+    return ruleBasedReply(text);
+  }
+
+  $("#cupid-btn").addEventListener("click", () => chat.toggle());
+  $("#chat-close").addEventListener("click", () => chat.toggle(false));
+  $$(".chip").forEach((c) => c.addEventListener("click", () => {
+    chat.input.value = c.textContent.trim();
+    chat.form.requestSubmit ? chat.form.requestSubmit() : chat.form.dispatchEvent(new Event("submit", { cancelable: true }));
+  }));
+
+  chat.form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const text = chat.input.value.trim();
+    if (!text) return;
+    chat.input.value = "";
+    chat.addMsg("me", text);
+    chat.history.push({ role: "user", content: text });
+    chat.setTyping(true);
+    const reply = await getCupidReply(text);
+    chat.setTyping(false);
+    chat.history.push({ role: "assistant", content: reply });
+    const el = chat.addMsg("cupid", "");
+    await typeInto(el, reply, 15, ++sayId);
+    chat.scrollEnd();
+  });
+
+  /* ================= The three answers ================= */
+  $("#btn-yes").addEventListener("click", (e) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    heartExplosion(r.left + r.width / 2, r.top + r.height / 2, 110);
+    heartRain(5200);
+    setCupidMood("happy");
+    cupidSay("I knew it! You are the best!", { typingMs: 350 });
+    goTo("screen-yes");
+
+    setTimeout(() => heartExplosion(window.innerWidth * 0.5, window.innerHeight * 0.35, 70), 550);
+    setTimeout(() => heartExplosion(window.innerWidth * 0.18, window.innerHeight * 0.3, 55), 1150);
+    setTimeout(() => heartExplosion(window.innerWidth * 0.82, window.innerHeight * 0.4, 55), 1750);
+
+    notify({
+      subject: "She said YES!",
+      type: "yes",
+      message: "She said YES! 💖\n\n" + (isPlaceholder(CONFIG.herName) ? "" : CONFIG.herName + " ") +
+        "just clicked YES on the proposal page at " + new Date().toLocaleString() + ".\n" +
+        "Go celebrate! 🎉❤️"
+    }).then((sent) => {
+      if (sent) $("#yes-email-note").classList.remove("hidden");
+    });
+  });
+
+  /* Typed confirmation — she MUST type “yes” before the final message appears */
+  $("#btn-yes-confirm").addEventListener("click", () => {
+    const input = $("#yes-typed");
+    const typed = (input.value || "").trim();
+    if (!/\byes\b/i.test(typed)) {
+      cupidSay("Type “YES” — I need to see it in writing 😉❤️");
+      input.classList.remove("shake");
+      void input.offsetWidth; // restart the shake animation
+      input.classList.add("shake");
+      input.focus();
+      return;
+    }
+    $("#yes-confirm-wrap").classList.add("hidden");
+    $("#yes-done").classList.remove("hidden");
+    heartExplosion(window.innerWidth * 0.5, window.innerHeight * 0.45, 90);
+    heartRain(4500);
+    cupidSay("She typed YES! This is really happening! 🎉💖", { typingMs: 300 });
+  });
+
+  $("#yes-typed").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      $("#btn-yes-confirm").click();
+    }
+  });
+
+  $("#btn-no").addEventListener("click", () => {
+    setCupidMood("sad");
+    sadFall(4200);
+    cupidSay("Oh no... Could you tell me why?", { typingMs: 400 });
+    goTo("screen-no");
+    setTimeout(() => $("#no-reason").focus({ preventScroll: true }), 700);
+  });
+
+  $("#btn-no-send").addEventListener("click", async () => {
+    const reason = $("#no-reason").value.trim();
+    if (!reason) {
+      cupidSay("Take your time… even one sentence helps me understand 💗");
+      $("#no-reason").focus();
+      return;
+    }
+    const sent = await notify({
+      subject: "She said NO 💔 — here's her reason",
+      type: "no",
+      message: "She said no — but she gave a reason. 💔\n\nHer reason:\n“" + reason + "”\n\nAnswered at " +
+        new Date().toLocaleString() + "."
+    });
+    $("#no-form-wrap").classList.add("hidden");
+    $("#no-done").classList.remove("hidden");
+    if (sent) $("#no-email-note").classList.remove("hidden");
+    setCupidMood("happy");
+    cupidSay("Thank you for being honest with me 💗 Whatever happens, you're wonderful.");
+  });
+
+  $("#btn-time").addEventListener("click", () => {
+    setCupidMood("happy");
+    cupidSay("Take all the time you need. When should I ask again?", { typingMs: 400 });
+    goTo("screen-time");
+  });
+
+  $("#btn-time-send").addEventListener("click", async () => {
+    const val = $("#when-input").value;
+    if (!val) {
+      cupidSay("Pick a day & time first, okay? 💗");
+      $("#when-input").focus();
+      return;
+    }
+    const when = new Date(val);
+    const nice = when.toLocaleString(undefined, { dateStyle: "full", timeStyle: "short" });
+    const sent = await notify({
+      subject: "She wants some time ⏳ — ask again on " + nice,
+      type: "time",
+      message: "She asked for more time — and picked a new moment. ⏳\n\nAsk her again on:\n" + nice +
+        "\n\nChosen at " + new Date().toLocaleString() + ". Don't be late 😉"
+    });
+    $("#time-form-wrap").classList.add("hidden");
+    $("#time-done").classList.remove("hidden");
+    $("#time-done-when").textContent = "I'll ask again on " + nice + " ⏳💕";
+    if (sent) $("#time-email-note").classList.remove("hidden");
+    cupidSay("It's a date! I'll be counting the seconds until then ⏳💕");
+  });
+
+  /* ================= datetime picker defaults ================= */
+  function toLocalISO(d) {
+    const p = (n) => String(n).padStart(2, "0");
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) +
+      "T" + p(d.getHours()) + ":" + p(d.getMinutes());
+  }
+  function setupDatetime() {
+    const input = $("#when-input");
+    const now = new Date();
+    input.min = toLocalISO(now);
+    const def = new Date(now.getTime() + 7 * 86400000);
+    def.setHours(18, 0, 0, 0);
+    input.value = toLocalISO(def);
+  }
+
+  /* ================= init ================= */
+  buildFloaties();
+  loadStoryImages();
+  setupDatetime();
+  // Greeting only if Cupid hasn't already spoken (e.g. she clicked through fast)
+  setTimeout(() => {
+    if (sayId === 0) cupidSay("Hi! I'm Cupid 💗 Tap me if you ever need help!");
+  }, 900);
+  </script>
+</body>
+</html>
